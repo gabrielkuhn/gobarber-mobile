@@ -6,13 +6,14 @@ import React, {
   useState,
   useCallback
 } from 'react'
-import { TextInputProps } from 'react-native'
+import { StyleProp, TextInputProps, ViewStyle } from 'react-native'
 import { useField } from '@unform/core'
 import { Container, TextInput, Icon } from './styles'
 
 interface InputProps extends TextInputProps {
   name: string
   icon: string
+  containerStyle?: StyleProp<ViewStyle>
 }
 
 interface InputValueReference {
@@ -24,7 +25,7 @@ interface InputRef {
 }
 
 const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
-  { name, icon, ...rest },
+  { name, icon, containerStyle = {}, ...rest },
   ref
 ) => {
   const inputElementRef = useRef<any>(null)
@@ -67,7 +68,7 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
   }, [registerField, fieldName])
 
   return (
-    <Container isFocused={isFocused} isErrored={!!error}>
+    <Container style={containerStyle} isFocused={isFocused} isErrored={!!error}>
       <Icon
         name={icon}
         size={20}
@@ -90,4 +91,3 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
   )
 }
 export default forwardRef(Input)
-// Ao colocar os inputs e o botão dentro do componente Form, é provável que o botão fique com uma largura menor. Para resolver esse problema você pode adicionar um width: '100%' na estilização inline do Form ou remover o width: 100% no css do botão.
