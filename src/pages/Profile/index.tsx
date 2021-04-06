@@ -1,4 +1,5 @@
 import React, { useCallback, useRef } from 'react'
+import { launchImageLibrary } from 'react-native-image-picker'
 import {
   KeyboardAvoidingView,
   Platform,
@@ -128,12 +129,40 @@ const Profile: React.FC = () => {
         )
       }
     },
-    [navigation]
+    [navigation, updateUser]
   )
 
   const handleGoBack = useCallback(() => {
     navigation.goBack()
   }, [navigation])
+
+  const handleUpdateAvatar = useCallback(() => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo'
+      },
+      response => {
+        if (response.didCancel) {
+          return
+        }
+        if (response.errorMessage) {
+          Alert.alert('Erro ao atualizar seu avatar')
+        }
+
+        const data = new FormData()
+
+        data.append('avatar', {
+          type: response.type,
+          uri: response.uri,
+          name: `${user.id}.${response.type}`
+        })
+
+        api.patch('users/avatar', data).then(apiResponse => {
+          updateUser(apiResponse.data)
+        })
+      }
+    )
+  }, [user.id, updateUser])
 
   return (
     <>
@@ -150,7 +179,7 @@ const Profile: React.FC = () => {
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
 
-            <UserAvatarButton onPress={}>
+            <UserAvatarButton onPress={handleUpdateAvatar}>
               <UserAvatar source={{ uri: user.avatar_url }} />
             </UserAvatarButton>
 
